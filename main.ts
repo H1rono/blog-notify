@@ -6,7 +6,15 @@ function init() {
 
 function main() {
     init();
-    Logger.log("Hello, world");
+    const pageBody = getCrowiPageBody("/Event/welcome/23/新歓ブログリレー");
+    const schedule = extractSchedule(pageBody);
+    const messageContent = `現在のブログリレー予定表:
+
+| 日付 | 日目 | 担当者 | タイトル(内容) |
+| :-: | :-: | :-: | :-- |
+${schedule.map(scheduleToString).join("\n")}`;
+    const res = postMessage(messageContent);
+    Logger.log(res.getResponseCode());
 }
 
 function getCrowiPageBody(path: string): string {
@@ -39,17 +47,45 @@ function postMessage(content: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
     return UrlFetchApp.fetch(url, params);
 }
 
-function extractScheduleTable(pageBody: string): string {
+type Schedule = {
+    date: string;
+    day: number;
+    writer: string;
+    summary: string;
+};
+
+function scheduleToString(s: Schedule): string {
+    return `| ${s.date} | ${s.day} | ${s.writer} | ${s.summary} |`;
+}
+
+function extractSchedule(pageBody: string): Schedule[] {
     const lines = pageBody.split(/\r\n|\r|\n/);
     const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"));
-    const table = [];
-    for (var i = startIndex; i < lines.length; ++i) {
+    const table: Schedule[] = [];
+    for (var i = startIndex + 2; i < lines.length; ++i) {
         const l = lines[i];
         if (l.startsWith("|")) {
-            table.push(l);
+            // | 日付 | 日目 | 担当者 | タイトル(内容) |
+            const cells = l
+                .split("|")
+                .slice(1, -1)
+                .map((c: string): string => c.trim());
+            const s: Schedule = {
+                date: cells[0],
+                day: parseInt(cells[1]),
+                writer: cells[2],
+                summary: cells[3],
+            };
+            if (s.writer.length === 0) {
+                continue;
+            }
+            if (s.date === "同上") {
+                s.date = table[table.length - 1].date;
+            }
+            table.push(s);
         } else {
             break;
         }
     }
-    return table.join("\n");
+    return table;
 }
