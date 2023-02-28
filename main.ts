@@ -1,5 +1,4 @@
 let props: GoogleAppsScript.Properties.Properties;
-// property keys: BOT_VERIFICATION_TOKEN, BOT_HOST, CROWI_ACCESS_TOKEN, CROWI_HOST, TRAQ_CHANNEL_ID
 
 function init() {
     props = PropertiesService.getScriptProperties();
@@ -38,4 +37,19 @@ function postMessage(content: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
         payload: JSON.stringify(payload),
     };
     return UrlFetchApp.fetch(url, params);
+}
+
+function extractScheduleTable(pageBody: string): string {
+    const lines = pageBody.split(/\r\n|\r|\n/);
+    const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"));
+    const table = [];
+    for (var i = startIndex; i < lines.length; ++i) {
+        const l = lines[i];
+        if (l.startsWith("|")) {
+            table.push(l);
+        } else {
+            break;
+        }
+    }
+    return table.join("\n");
 }
