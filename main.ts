@@ -1,4 +1,5 @@
 let props: GoogleAppsScript.Properties.Properties;
+const WRITER_REGEXP = /@[a-zA-Z0-9_-]+/g;
 
 function init() {
     props = PropertiesService.getScriptProperties();
@@ -55,7 +56,10 @@ type Schedule = {
 };
 
 function scheduleToString(s: Schedule): string {
-    return `| ${s.date} | ${s.day} | ${s.writer} | ${s.summary} |`;
+    let writers = Array.from(s.writer.matchAll(WRITER_REGEXP))
+        .map((match) => match[0])
+        .join(", ");
+    return `| ${s.date} | ${s.day} | ${writers} | ${s.summary} |`;
 }
 
 function extractSchedule(pageBody: string): Schedule[] {
