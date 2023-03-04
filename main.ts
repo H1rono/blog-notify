@@ -9,7 +9,10 @@ function main() {
     init();
     const pageBody = getCrowiPageBody("/Event/welcome/23/新歓ブログリレー");
     const schedule = extractSchedule(pageBody);
-    const messageContent = `現在のブログリレー予定表:
+    const messageContent = `\
+# ${getDateMessage(new Date("2023-03-09T00:00:00+09:00"))}
+
+現在のブログリレー予定表:
 
 | 日付 | 日目 | 担当者 | タイトル(内容) |
 | :-: | :-: | :-: | :-- |
@@ -93,4 +96,23 @@ function extractSchedule(pageBody: string): Schedule[] {
         }
     }
     return table;
+}
+
+// 与えられた日付との差分を取得する
+// now - date
+function calcDateDiff(date: Date) {
+    const dateUtcTime = date.getTime() + date.getTimezoneOffset() * 60 * 1000;
+    const now = new Date();
+    const nowUtcTime = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
+    const diff = nowUtcTime - dateUtcTime;
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+function getDateMessage(date: Date) {
+    const diff = calcDateDiff(date);
+    if (diff < 0) {
+        return `新歓ブログリレーまであと ${-diff}日`;
+    } else {
+        return `新歓ブログリレー ${diff + 1}日目`;
+    }
 }
