@@ -42,7 +42,7 @@ function postMessage(content: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
     const payload = {
         channelId: channelId,
         content: content,
-        embed: false,
+        embed: true,
     };
     const params: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
         method: "post",
