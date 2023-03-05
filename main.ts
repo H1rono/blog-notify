@@ -23,11 +23,11 @@ function main() {
     const schedules = extractSchedule(pageBody);
     const dateDiff = calcDateDiff();
     const messageHead = dateDiff < 0 ? getBeforeMessage(-dateDiff) : getDuringMessage(dateDiff, schedules);
-    const res = postMessage(messageHead + noticeMessage);
+    const res = postMessage(messageHead + noticeMessage, false);
     Logger.log(res.getResponseCode());
     // Logger.log(messageHead + noticeMessage);
     const logMessage = extractScheduleStr(pageBody);
-    const res2 = postLogMessage(logMessage);
+    const res2 = postMessage(logMessage, true);
     Logger.log(res2.getResponseCode());
     // Logger.log(logMessage);
 }
@@ -43,36 +43,16 @@ function getCrowiPageBody(): string {
     return payload["page"]["revision"]["body"] as string;
 }
 
-function postMessage(content: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
+function postMessage(content: string, log: boolean): GoogleAppsScript.URL_Fetch.HTTPResponse {
     const host = props.getProperty("BOT_HOST");
     const token = props.getProperty("BOT_VERIFICATION_TOKEN");
     const channelId = props.getProperty("TRAQ_CHANNEL_ID");
+    const logChannelId = props.getProperty("TRAQ_LOG_CHANNEL_ID");
     const url = `http://${host}/api/say`;
     const payload = {
-        channelId: channelId,
+        channelId: log ? logChannelId : channelId,
         content: content,
-        embed: true,
-    };
-    const params: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
-        method: "post",
-        contentType: "application/json",
-        headers: {
-            "X-TRAQ-BOT-TOKEN": token,
-        },
-        payload: JSON.stringify(payload),
-    };
-    return UrlFetchApp.fetch(url, params);
-}
-
-function postLogMessage(content: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
-    const host = props.getProperty("BOT_HOST");
-    const token = props.getProperty("BOT_VERIFICATION_TOKEN");
-    const channelId = props.getProperty("TRAQ_LOG_CHANNEL_ID");
-    const url = `http://${host}/api/say`;
-    const payload = {
-        channelId: channelId,
-        content: content,
-        embed: false,
+        embed: !log,
     };
     const params: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
         method: "post",
@@ -125,33 +105,28 @@ function extractScheduleStr(pageBody: string): string {
 }
 
 function extractSchedule(pageBody: string): Schedule[] {
-    const lines = pageBody.split(/\r\n|\r|\n/);
-    const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"));
+    const tableStr = extractScheduleStr(pageBody);
+    const lines = tableStr.split("\n").filter((l: string): boolean => l.startsWith("|"));
     const table: Schedule[] = [];
-    for (var i = startIndex + 2; i < lines.length; ++i) {
-        const l = lines[i];
-        if (l.startsWith("|")) {
-            // | 日付 | 日目 | 担当者 | タイトル(内容) |
-            const cells = l
-                .split("|")
-                .slice(1, -1)
-                .map((c: string): string => c.trim());
-            const s: Schedule = {
-                date: cells[0],
-                day: parseInt(cells[1]),
-                writer: cells[2],
-                summary: cells[3],
-            };
-            if (s.writer.length === 0) {
-                continue;
-            }
-            if (s.date === "同上") {
-                s.date = table[table.length - 1].date;
-            }
-            table.push(s);
-        } else {
-            break;
+    for (var i = 2; i < lines.length; ++i) {
+        // | 日付 | 日目 | 担当者 | タイトル(内容) |
+        const cells = lines[i]
+            .split("|")
+            .slice(1, -1)
+            .map((c: string): string => c.trim());
+        const s: Schedule = {
+            date: cells[0],
+            day: parseInt(cells[1]),
+            writer: cells[2],
+            summary: cells[3],
+        };
+        if (s.writer.length === 0) {
+            continue;
         }
+        if (s.date === "同上") {
+            s.date = table[table.length - 1].date;
+        }
+        table.push(s);
     }
     return table;
 }
