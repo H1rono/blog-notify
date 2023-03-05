@@ -7,23 +7,25 @@ function init() {
 
 function main() {
     init();
-    const pageBody = getCrowiPageBody("/Event/welcome/23/新歓ブログリレー");
+    const pageBody = getCrowiPageBody();
     const schedule = extractSchedule(pageBody);
     const messageContent = `\
-# ${getDateMessage(new Date("2023-03-09T00:00:00+09:00"))}
+# ${getDateMessage()}
 
 現在のブログリレー予定表:
 
 | 日付 | 日目 | 担当者 | タイトル(内容) |
-| :-: | :-: | :-: | :-- |
+| :-: | :-: | :-- | :-- |
 ${schedule.map(scheduleToString).join("\n")}`;
     const res = postMessage(messageContent);
     Logger.log(res.getResponseCode());
+    // Logger.log(messageContent);
 }
 
-function getCrowiPageBody(path: string): string {
+function getCrowiPageBody(): string {
     const host = props.getProperty("CROWI_HOST");
     const token = props.getProperty("CROWI_ACCESS_TOKEN");
+    const path = props.getProperty("CROWI_PAGE_PATH");
     const encodedPath = encodeURI(path);
     const url = `https://${host}/_api/pages.get?access_token=${token}&path=${encodedPath}`;
     const res = UrlFetchApp.fetch(url);
@@ -98,9 +100,10 @@ function extractSchedule(pageBody: string): Schedule[] {
     return table;
 }
 
-// 与えられた日付との差分を取得する
+// START_DATEとの差分を取得する
 // now - date
-function calcDateDiff(date: Date) {
+function calcDateDiff(): number {
+    const date = new Date(props.getProperty("START_DATE"));
     const dateUtcTime = date.getTime() + date.getTimezoneOffset() * 60 * 1000;
     const now = new Date();
     const nowUtcTime = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
@@ -108,8 +111,8 @@ function calcDateDiff(date: Date) {
     return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
-function getDateMessage(date: Date) {
-    const diff = calcDateDiff(date);
+function getDateMessage(): string {
+    const diff = calcDateDiff();
     if (diff < 0) {
         return `新歓ブログリレーまであと ${-diff}日`;
     } else {
