@@ -1,5 +1,12 @@
 let props: GoogleAppsScript.Properties.Properties;
 const WRITER_REGEXP = /@[a-zA-Z0-9_-]+/g;
+const NOTICE_MESSAGE = `
+## 注意事項
+- \`新歓ブログリレー2023\`のタグをつけてください
+- 記事の初めにブログリレー何日目の記事かを明記してください
+- 記事の最後に次の日の担当者を紹介してください
+- **post imageを設定して**ください
+- わからないことがあれば気軽に #event/welcome/blog/buri まで`;
 
 function init() {
     props = PropertiesService.getScriptProperties();
@@ -8,18 +15,12 @@ function init() {
 function main() {
     init();
     const pageBody = getCrowiPageBody();
-    const schedule = extractSchedule(pageBody);
-    const messageContent = `\
-# ${getDateMessage()}
-
-現在のブログリレー予定表:
-
-| 日付 | 日目 | 担当者 | タイトル(内容) |
-| :-: | :-: | :-- | :-- |
-${schedule.map(scheduleToString).join("\n")}`;
-    const res = postMessage(messageContent);
+    const schedules = extractSchedule(pageBody);
+    const dateDiff = calcDateDiff();
+    const messageHead = dateDiff < 0 ? getBeforeMessage(-dateDiff) : getDuringMessage(dateDiff, schedules);
+    const res = postMessage(messageHead + NOTICE_MESSAGE);
     Logger.log(res.getResponseCode());
-    // Logger.log(messageContent);
+    // Logger.log(messageHead + NOTICE_MESSAGE);
 }
 
 function getCrowiPageBody(): string {
@@ -68,6 +69,13 @@ function scheduleToString(s: Schedule): string {
     return `| ${s.date} | ${s.day} | ${writers} | ${s.summary} |`;
 }
 
+function schedulesToTable(schedules: Schedule[]): string {
+    return `\
+| 日付 | 日目 | 担当者 | タイトル(内容) |
+| :-: | :-: | :-- | :-- |
+${schedules.map(scheduleToString).join("\n")}`;
+}
+
 function extractSchedule(pageBody: string): Schedule[] {
     const lines = pageBody.split(/\r\n|\r|\n/);
     const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"));
@@ -111,11 +119,19 @@ function calcDateDiff(): number {
     return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
-function getDateMessage(): string {
-    const diff = calcDateDiff();
-    if (diff < 0) {
-        return `新歓ブログリレーまであと ${-diff}日`;
-    } else {
-        return `新歓ブログリレー ${diff + 1}日目`;
+// ブログリレー期間前のメッセージを取得する関数
+// diff > 0
+function getBeforeMessage(diff: number): string {
+    return `# 新歓ブログリレーまであと ${diff}日`;
+}
+
+// ブログリレー期間中のメッセージを取得する関数
+// diff >= 0
+function getDuringMessage(diff: number, schedules: Schedule[]): string {
+    const d = diff + 1;
+    const ss = schedules.filter((s: Schedule): boolean => d <= s.day && s.day <= d + 1);
+    if (ss.length > 0) {
+        return `# 新歓ブログリレー ${d}日目\n担当者:\n${schedulesToTable(ss)}`;
     }
+    return `# 新歓ブログリレー ${d}日目\n担当者はいません`;
 }
