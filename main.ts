@@ -1,15 +1,20 @@
 let props: GoogleAppsScript.Properties.Properties;
 const WRITER_REGEXP = /@[a-zA-Z0-9_-]+/g;
-const NOTICE_MESSAGE = `
+let noticeMessage: string;
+
+function init() {
+    props = PropertiesService.getScriptProperties();
+    const crowi_host = props.getProperty("CROWI_HOST");
+    const crowi_path = props.getProperty("CROWI_PAGE_PATH");
+    const url = `https://${crowi_host}${crowi_path}`;
+    noticeMessage = `
 ## 注意事項
 - \`新歓ブログリレー2023\`のタグをつけてください
 - 記事の初めにブログリレー何日目の記事かを明記してください
 - 記事の最後に次の日の担当者を紹介してください
 - **post imageを設定して**ください
-- わからないことがあれば気軽に #event/welcome/blog/buri まで`;
-
-function init() {
-    props = PropertiesService.getScriptProperties();
+- わからないことがあれば気軽に #event/welcome/blog/buri まで
+- 詳細は ${url}`;
 }
 
 function main() {
@@ -18,9 +23,9 @@ function main() {
     const schedules = extractSchedule(pageBody);
     const dateDiff = calcDateDiff();
     const messageHead = dateDiff < 0 ? getBeforeMessage(-dateDiff) : getDuringMessage(dateDiff, schedules);
-    const res = postMessage(messageHead + NOTICE_MESSAGE);
+    const res = postMessage(messageHead + noticeMessage);
     Logger.log(res.getResponseCode());
-    // Logger.log(messageHead + NOTICE_MESSAGE);
+    // Logger.log(messageHead + noticeMessage);
 }
 
 function getCrowiPageBody(): string {
