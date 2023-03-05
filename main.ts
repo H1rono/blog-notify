@@ -26,6 +26,10 @@ function main() {
     const res = postMessage(messageHead + noticeMessage);
     Logger.log(res.getResponseCode());
     // Logger.log(messageHead + noticeMessage);
+    const logMessage = extractScheduleStr(pageBody);
+    const res2 = postLogMessage(logMessage);
+    Logger.log(res2.getResponseCode());
+    // Logger.log(logMessage);
 }
 
 function getCrowiPageBody(): string {
@@ -60,6 +64,27 @@ function postMessage(content: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
     return UrlFetchApp.fetch(url, params);
 }
 
+function postLogMessage(content: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
+    const host = props.getProperty("BOT_HOST");
+    const token = props.getProperty("BOT_VERIFICATION_TOKEN");
+    const channelId = props.getProperty("TRAQ_LOG_CHANNEL_ID");
+    const url = `http://${host}/api/say`;
+    const payload = {
+        channelId: channelId,
+        content: content,
+        embed: false,
+    };
+    const params: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
+        method: "post",
+        contentType: "application/json",
+        headers: {
+            "X-TRAQ-BOT-TOKEN": token,
+        },
+        payload: JSON.stringify(payload),
+    };
+    return UrlFetchApp.fetch(url, params);
+}
+
 type Schedule = {
     date: string;
     day: number;
@@ -79,6 +104,24 @@ function schedulesToTable(schedules: Schedule[]): string {
 | 日付 | 日目 | 担当者 | タイトル(内容) |
 | :-: | :-: | :-- | :-- |
 ${schedules.map(scheduleToString).join("\n")}`;
+}
+
+function extractScheduleStr(pageBody: string): string {
+    const lines = pageBody.split(/\r\n|\r|\n/);
+    const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"));
+    var table = `\
+| 日付 | 日目 | 担当者 | タイトル(内容) |
+| :-: | :-: | :-- | :-- |
+`;
+    for (var i = startIndex + 2; i < lines.length; ++i) {
+        const l = lines[i];
+        if (l.startsWith("|")) {
+            table += l + "\n";
+        } else {
+            break;
+        }
+    }
+    return table;
 }
 
 function extractSchedule(pageBody: string): Schedule[] {

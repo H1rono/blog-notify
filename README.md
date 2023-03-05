@@ -31,5 +31,6 @@ key | value
 `CROWI_ACCESS_TOKEN` | WikiのAPIアクセストークン
 `CROWI_HOST` | Wikiのサーバーのhostname
 `TRAQ_CHANNEL_ID` | 通知を投稿するチャンネルのID
+`TRAQ_LOG_CHANNEL_ID` | 実行ログを流すチャンネルのID
 `CROWI_PAGE_PATH` | ブログリレーページのパス
 `START_DATE` | ブログリレー開始日
