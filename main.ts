@@ -43,6 +43,15 @@ function getCrowiPageBody(): string {
     return payload["page"]["revision"]["body"] as string;
 }
 
+function hmacSha1(key: string, message: string): string {
+    const algorithm = Utilities.MacAlgorithm.HMAC_SHA_1;
+    const charset = Utilities.Charset.UTF_8;
+    return Utilities.computeHmacSignature(algorithm, message, key, charset)
+        .map((v) => (v < 0 ? v + 256 : v))
+        .map((v) => v.toString(16).padStart(2, "0"))
+        .join("");
+}
+
 function postMessage(content: string, log: boolean): GoogleAppsScript.URL_Fetch.HTTPResponse {
     const host = props.getProperty("BOT_HOST");
     const token = props.getProperty("BOT_VERIFICATION_TOKEN");
