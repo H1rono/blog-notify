@@ -53,24 +53,21 @@ function hmacSha1(key: string, message: string): string {
 }
 
 function postMessage(content: string, log: boolean): GoogleAppsScript.URL_Fetch.HTTPResponse {
-    const host = props.getProperty("BOT_HOST");
-    const token = props.getProperty("BOT_VERIFICATION_TOKEN");
+    const webhookSecret = props.getProperty("WEBHOOK_SECRET");
+    const signature = hmacSha1(webhookSecret, content);
     const channelId = props.getProperty("TRAQ_CHANNEL_ID");
     const logChannelId = props.getProperty("TRAQ_LOG_CHANNEL_ID");
-    const url = `http://${host}/api/say`;
-    const payload = {
-        channelId: log ? logChannelId : channelId,
-        content: content,
-        embed: !log,
-    };
     const params: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
         method: "post",
-        contentType: "application/json",
+        contentType: "text/plain; charset=utf-8",
         headers: {
-            "X-TRAQ-BOT-TOKEN": token,
+            "X-TRAQ-Signature": signature,
+            "X-TRAQ-Channel-Id": log ? logChannelId : channelId,
         },
-        payload: JSON.stringify(payload),
+        payload: content,
     };
+    const webhookId = props.getProperty("WEBHOOK_ID");
+    const url = `https://q.trap.jp/api/v3/webhooks/${webhookId}?embed=${!log}`;
     return UrlFetchApp.fetch(url, params);
 }
 
