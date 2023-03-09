@@ -88,18 +88,15 @@ function scheduleToString(s: Schedule): string {
 function schedulesToTable(schedules: Schedule[]): string {
     return `\
 | 日付 | 日目 | 担当者 | タイトル(内容) |
-| :-: | :-: | :-- | :-- |
+| :-: | :-: | :-: | :-- |
 ${schedules.map(scheduleToString).join("\n")}`;
 }
 
 function extractScheduleStr(pageBody: string): string {
     const lines = pageBody.split(/\r\n|\r|\n/);
     const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"));
-    var table = `\
-| 日付 | 日目 | 担当者 | タイトル(内容) |
-| :-: | :-: | :-- | :-- |
-`;
-    for (var i = startIndex + 2; i < lines.length; ++i) {
+    var table = "";
+    for (var i = startIndex; i < lines.length; ++i) {
         const l = lines[i];
         if (l.startsWith("|")) {
             table += l + "\n";
@@ -160,7 +157,7 @@ function getDuringMessage(diff: number, schedules: Schedule[]): string {
     const d = diff + 1;
     const ss = schedules.filter((s: Schedule): boolean => d <= s.day && s.day <= d + 1);
     if (ss.length > 0) {
-        return `# 新歓ブログリレー ${d}日目\n担当者:\n${schedulesToTable(ss)}`;
+        return `# 新歓ブログリレー ${d}日目\n${schedulesToTable(ss)}`;
     }
     return `# 新歓ブログリレー ${d}日目\n担当者はいません`;
 }
