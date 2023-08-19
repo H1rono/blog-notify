@@ -7,9 +7,9 @@ type InitResult = {
 
 function init(): InitResult {
     const props = PropertiesService.getScriptProperties()
-    const crowi_host = props.getProperty("CROWI_HOST")
-    const crowi_path = props.getProperty("CROWI_PAGE_PATH")
-    const url = `https://${crowi_host}${crowi_path}`
+    const crowiHost = props.getProperty("CROWI_HOST") ?? "crowi.example.com"
+    const crowiPath = props.getProperty("CROWI_PAGE_PATH") ?? "/path/to/page"
+    const url = `https://${crowiHost}${crowiPath}`
     const noticeMessage = `
 ## 注意事項
 - \`新歓ブログリレー2023\`のタグをつけてください
@@ -21,7 +21,8 @@ function init(): InitResult {
     return { props, noticeMessage }
 }
 
-function main() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function main(): void {
     const { props, noticeMessage } = init()
     const pageBody = getCrowiPageBody(props)
     const schedules = extractSchedule(pageBody)
@@ -47,6 +48,7 @@ function getCrowiPageBody(props: GoogleAppsScript.Properties.Properties): string
     const url = `https://${host}/_api/pages.get?access_token=${token}&path=${encodedPath}`
     const res = UrlFetchApp.fetch(url)
     const payload = JSON.parse(res.getContentText())
+    // eslint-disable-next-line @typescript-eslint/dot-notation
     return payload["page"]["revision"]["body"] as string
 }
 
@@ -65,10 +67,11 @@ function postMessage(
     log: boolean,
 ): GoogleAppsScript.URL_Fetch.HTTPResponse | null {
     const webhookSecret = props.getProperty("WEBHOOK_SECRET")
-    const signature = webhookSecret && hmacSha1(webhookSecret, content)
+    const signature = webhookSecret != null ? hmacSha1(webhookSecret, content) : ""
     const channelId = props.getProperty("TRAQ_CHANNEL_ID")
     const logChannelId = props.getProperty("TRAQ_LOG_CHANNEL_ID")
-    if (signature === null || channelId === null || logChannelId === null) {
+    const webhookId = props.getProperty("WEBHOOK_ID")
+    if (signature === null || channelId === null || logChannelId === null || webhookId === null) {
         return null
     }
     const params: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
@@ -80,8 +83,7 @@ function postMessage(
         },
         payload: content,
     }
-    const webhookId = props.getProperty("WEBHOOK_ID")
-    const url = `https://q.trap.jp/api/v3/webhooks/${webhookId}?embed=${!log}`
+    const url = `https://q.trap.jp/api/v3/webhooks/${webhookId}?embed=${(!log).toString()}`
     return UrlFetchApp.fetch(url, params)
 }
 
@@ -93,7 +95,7 @@ type Schedule = {
 }
 
 function scheduleToString(s: Schedule): string {
-    let writers = Array.from(s.writer.matchAll(WRITER_REGEXP))
+    const writers = Array.from(s.writer.matchAll(WRITER_REGEXP))
         .map((match) => match[0])
         .join(", ")
     return `| ${s.date} | ${s.day} | ${writers} | ${s.summary} |`
@@ -109,8 +111,8 @@ ${schedules.map(scheduleToString).join("\n")}`
 function extractScheduleStr(pageBody: string): string {
     const lines = pageBody.split(/\r\n|\r|\n/)
     const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"))
-    var table = ""
-    for (var i = startIndex; i < lines.length; ++i) {
+    let table = ""
+    for (let i = startIndex; i < lines.length; ++i) {
         const l = lines[i]
         if (l.startsWith("|")) {
             table += l + "\n"
@@ -125,7 +127,7 @@ function extractSchedule(pageBody: string): Schedule[] {
     const tableStr = extractScheduleStr(pageBody)
     const lines = tableStr.split("\n").filter((l: string): boolean => l.startsWith("|"))
     const table: Schedule[] = []
-    for (var i = 2; i < lines.length; ++i) {
+    for (let i = 2; i < lines.length; ++i) {
         // | 日付 | 日目 | 担当者 | タイトル(内容) |
         const cells = lines[i]
             .split("|")
