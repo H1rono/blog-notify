@@ -1,8 +1,8 @@
 const WRITER_REGEXP = /@[a-zA-Z0-9_-]+/g
 
 type InitResult = {
-    props: GoogleAppsScript.Properties.Properties;
-    noticeMessage: string;
+    props: GoogleAppsScript.Properties.Properties
+    noticeMessage: string
 }
 
 function init(): InitResult {
@@ -22,7 +22,7 @@ function init(): InitResult {
 }
 
 function main() {
-    const {props, noticeMessage} = init()
+    const { props, noticeMessage } = init()
     const pageBody = getCrowiPageBody(props)
     const schedules = extractSchedule(pageBody)
     const dateDiff = calcDateDiff(props)
@@ -59,7 +59,11 @@ function hmacSha1(key: string, message: string): string {
         .join("")
 }
 
-function postMessage(props: GoogleAppsScript.Properties.Properties, content: string, log: boolean): GoogleAppsScript.URL_Fetch.HTTPResponse | null {
+function postMessage(
+    props: GoogleAppsScript.Properties.Properties,
+    content: string,
+    log: boolean,
+): GoogleAppsScript.URL_Fetch.HTTPResponse | null {
     const webhookSecret = props.getProperty("WEBHOOK_SECRET")
     const signature = webhookSecret && hmacSha1(webhookSecret, content)
     const channelId = props.getProperty("TRAQ_CHANNEL_ID")
@@ -82,10 +86,10 @@ function postMessage(props: GoogleAppsScript.Properties.Properties, content: str
 }
 
 type Schedule = {
-    date: string;
-    day: number;
-    writer: string;
-    summary: string;
+    date: string
+    day: number
+    writer: string
+    summary: string
 }
 
 function scheduleToString(s: Schedule): string {
