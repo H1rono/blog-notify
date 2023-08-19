@@ -9,11 +9,14 @@ type CrowiInfo = {
 type traQInfo = {
     channelId: string
     logChannelId: string
+    buriChannelPath: string
     webhookId: string
     webhookSecret: string
 }
 
 type BlogRelayInfo = {
+    tag: string
+    title: string
     startDate: string
 }
 
@@ -34,23 +37,32 @@ function init(): InitResult | null {
     }
     const traQChannelId = props.getProperty("TRAQ_CHANNEL_ID")
     const traQLogChannelId = props.getProperty("TRAQ_LOG_CHANNEL_ID")
+    const traQBuriChannelPath = props.getProperty("TRAQ_BURI_CHANNEL_PATH")
     const traQWebhookId = props.getProperty("WEBHOOK_ID")
     const traQWebhookSecret = props.getProperty("WEBHOOK_SECRET")
-    if (traQChannelId === null || traQLogChannelId === null || traQWebhookId === null || traQWebhookSecret === null) {
+    if (
+        traQChannelId === null ||
+        traQLogChannelId === null ||
+        traQBuriChannelPath === null ||
+        traQWebhookId === null ||
+        traQWebhookSecret === null
+    ) {
         return null
     }
+    const blogRelayTag = props.getProperty("TAG")
+    const blogRelayTitle = props.getProperty("TITLE")
     const blogRelayStartDate = props.getProperty("START_DATE")
-    if (blogRelayStartDate === null) {
+    if (blogRelayTag === null || blogRelayTitle === null || blogRelayStartDate === null) {
         return null
     }
     const url = `https://${crowiHost}${crowiPath}`
     const noticeMessage = `
 ## 注意事項
-- \`新歓ブログリレー2023\`のタグをつけてください
+- \`${blogRelayTag}\`のタグをつけてください
 - 記事の初めにブログリレー何日目の記事かを明記してください
 - 記事の最後に次の日の担当者を紹介してください
 - **post imageを設定して**ください
-- わからないことがあれば気軽に #event/welcome/blog/buri まで
+- わからないことがあれば気軽に ${traQBuriChannelPath} まで
 - 詳細は ${url}`
     return {
         crowi: {
@@ -61,10 +73,13 @@ function init(): InitResult | null {
         traQ: {
             channelId: traQChannelId,
             logChannelId: traQLogChannelId,
+            buriChannelPath: traQBuriChannelPath,
             webhookId: traQWebhookId,
             webhookSecret: traQWebhookSecret,
         },
         blogRelay: {
+            tag: blogRelayTag,
+            title: blogRelayTitle,
             startDate: blogRelayStartDate,
         },
         noticeMessage,
@@ -82,7 +97,10 @@ function main(): void {
     const pageBody = getCrowiPageBody(crowi)
     const schedules = extractSchedule(pageBody)
     const dateDiff = calcDateDiff(blogRelay)
-    const messageHead = dateDiff < 0 ? getBeforeMessage(-dateDiff) : getDuringMessage(dateDiff, schedules)
+    const messageHead =
+        dateDiff < 0
+            ? getBeforeMessage(blogRelay.title, -dateDiff)
+            : getDuringMessage(blogRelay.title, dateDiff, schedules)
     const res = postMessage(traQ, messageHead + noticeMessage, false)
     Logger.log(res?.getResponseCode())
     // Logger.log(messageHead + noticeMessage)
@@ -205,17 +223,17 @@ function calcDateDiff({ startDate }: BlogRelayInfo): number {
 
 // ブログリレー期間前のメッセージを取得する関数
 // diff > 0
-function getBeforeMessage(diff: number): string {
-    return `# 新歓ブログリレーまであと ${diff}日`
+function getBeforeMessage(title: string, diff: number): string {
+    return `# ${title}まであと ${diff}日`
 }
 
 // ブログリレー期間中のメッセージを取得する関数
 // diff >= 0
-function getDuringMessage(diff: number, schedules: Schedule[]): string {
+function getDuringMessage(title: string, diff: number, schedules: Schedule[]): string {
     const d = diff + 1
     const ss = schedules.filter((s: Schedule): boolean => d <= s.day && s.day <= d + 1)
     if (ss.length > 0) {
-        return `# 新歓ブログリレー ${d}日目\n${schedulesToTable(ss)}`
+        return `# ${title} ${d}日目\n${schedulesToTable(ss)}`
     }
-    return `# 新歓ブログリレー ${d}日目\n担当者はいません`
+    return `# ${title} ${d}日目\n担当者はいません`
 }
