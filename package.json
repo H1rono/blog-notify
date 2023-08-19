@@ -5,7 +5,12 @@
   "main": "main.ts",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "lint": "eslint ./main.ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "lint:warn": "eslint . --ext .ts --max-warnings 0"
   },
   "keywords": [],
   "author": "H1rono <hronok66@gmail.com>",
