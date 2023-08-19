@@ -18,7 +18,7 @@ crowi → traQ Webhook with GAS
 $ git clone https://github.com/H1rono/blog-notify.git
 $ cd blog-notify
 $ npm i
-$ clasp clone --rootDir "$(pwd)" scriptId ${YOUR_GAS_SCRIPT_ID}
+$ clasp clone --rootDir "$(pwd)" "${YOUR_GAS_SCRIPT_ID}"
 $ rm main.js    # ローカルではTypeScriptを使用するため削除
 ```
 
@@ -26,11 +26,14 @@ $ rm main.js    # ローカルではTypeScriptを使用するため削除
 
 key | value
 :-- | :--
-`CROWI_ACCESS_TOKEN` | WikiのAPIアクセストークン
 `CROWI_HOST` | Wikiのサーバーのhostname
+`CROWI_PAGE_PATH` | ブログリレーページのパス
+`CROWI_ACCESS_TOKEN` | WikiのAPIアクセストークン
 `TRAQ_CHANNEL_ID` | 通知を投稿するチャンネルのID
 `TRAQ_LOG_CHANNEL_ID` | 実行ログを流すチャンネルのID
-`CROWI_PAGE_PATH` | ブログリレーページのパス
-`START_DATE` | ブログリレー開始日
+`TRAQ_BURI_CHANNEL_ID` | ブログリレー運営チャンネルのパス(`#`始まり)
 `WEBHOOK_SECRET` | Webhookシークレット
 `WEBHOOK_ID` | Webhook ID
+`TAG` | ブログリレーで使用するタグ
+`TITLE` | ブログリレーのタイトル
+`START_DATE` | ブログリレー開始日
