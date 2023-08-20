@@ -1,6 +1,7 @@
 # blog-notify
 
 [![clasp](https://img.shields.io/badge/built%20with-clasp-4285f4.svg)](https://github.com/google/clasp)
+[![Node.js CI](https://github.com/H1rono/blog-notify/actions/workflows/node.yml/badge.svg)](https://github.com/H1rono/blog-notify/actions/workflows/node.yml)
 
 crowi → traQ Webhook with GAS
 
