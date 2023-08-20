@@ -7,6 +7,7 @@ type CrowiInfo = {
 }
 
 type traQInfo = {
+    host: string
     channelId: string
     logChannelId: string
     buriChannelPath: string
@@ -35,12 +36,14 @@ function init(): InitResult | null {
     if (crowiHost === null || crowiPath === null || crowiToken === null) {
         return null
     }
+    const traQHost = props.getProperty("TRAQ_HOST")
     const traQChannelId = props.getProperty("TRAQ_CHANNEL_ID")
     const traQLogChannelId = props.getProperty("TRAQ_LOG_CHANNEL_ID")
     const traQBuriChannelPath = props.getProperty("TRAQ_BURI_CHANNEL_PATH")
     const traQWebhookId = props.getProperty("WEBHOOK_ID")
     const traQWebhookSecret = props.getProperty("WEBHOOK_SECRET")
     if (
+        traQHost === null ||
         traQChannelId === null ||
         traQLogChannelId === null ||
         traQBuriChannelPath === null ||
@@ -71,6 +74,7 @@ function init(): InitResult | null {
             token: crowiToken,
         },
         traQ: {
+            host: traQHost,
             channelId: traQChannelId,
             logChannelId: traQLogChannelId,
             buriChannelPath: traQBuriChannelPath,
@@ -129,7 +133,7 @@ function hmacSha1(key: string, message: string): string {
 }
 
 function postMessage(
-    { channelId, logChannelId, webhookId, webhookSecret }: traQInfo,
+    { host, channelId, logChannelId, webhookId, webhookSecret }: traQInfo,
     content: string,
     log: boolean,
 ): GoogleAppsScript.URL_Fetch.HTTPResponse | null {
@@ -143,7 +147,7 @@ function postMessage(
         },
         payload: content,
     }
-    const url = `https://q.trap.jp/api/v3/webhooks/${webhookId}?embed=${(!log).toString()}`
+    const url = `https://${host}/api/v3/webhooks/${webhookId}?embed=${(!log).toString()}`
     return UrlFetchApp.fetch(url, params)
 }
 
