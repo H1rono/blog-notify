@@ -106,11 +106,11 @@ function main(): void {
             ? getBeforeMessage(blogRelay.title, -dateDiff)
             : getDuringMessage(blogRelay.title, dateDiff, schedules)
     const res = postMessage(traQ, messageHead + noticeMessage, false)
-    Logger.log(res?.getResponseCode())
+    Logger.log(res.getResponseCode())
     // Logger.log(messageHead + noticeMessage)
     const logMessage = extractScheduleStr(pageBody)
     const res2 = postMessage(traQ, logMessage, true)
-    Logger.log(res2?.getResponseCode())
+    Logger.log(res2.getResponseCode())
     // Logger.log(logMessage)
 }
 
@@ -136,7 +136,7 @@ function postMessage(
     { host, channelId, logChannelId, webhookId, webhookSecret }: traQInfo,
     content: string,
     log: boolean,
-): GoogleAppsScript.URL_Fetch.HTTPResponse | null {
+): GoogleAppsScript.URL_Fetch.HTTPResponse {
     const signature = hmacSha1(webhookSecret, content)
     const params: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
         method: "post",
