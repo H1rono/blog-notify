@@ -29,6 +29,7 @@ key | value
 `CROWI_HOST` | Wikiのサーバーのhostname
 `CROWI_PAGE_PATH` | ブログリレーページのパス
 `CROWI_ACCESS_TOKEN` | WikiのAPIアクセストークン
+`TRAQ_HOST` | traQのサーバーのhostname
 `TRAQ_CHANNEL_ID` | 通知を投稿するチャンネルのID
 `TRAQ_LOG_CHANNEL_ID` | 実行ログを流すチャンネルのID
 `TRAQ_BURI_CHANNEL_ID` | ブログリレー運営チャンネルのパス(`#`始まり)
