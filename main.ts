@@ -170,11 +170,11 @@ ${schedules.map(scheduleToString).join("\n")}`
 
 function extractScheduleStr(pageBody: string): string {
     const lines = pageBody.split(/\r\n|\r|\n/)
-    const startIndex = lines.findIndex((l: string): boolean => l.startsWith("|日付"))
+    const startIndex = lines.findIndex((l: string): boolean => /^\|\s*日付.*/.test(l))
     let table = ""
     for (let i = startIndex; i < lines.length; ++i) {
         const l = lines[i]
-        if (l.startsWith("|")) {
+        if (/^\s*\|.*/.test(l)) {
             table += l + "\n"
         } else {
             break
