@@ -105,14 +105,14 @@ function main(): void {
         dateDiff < 0
             ? getBeforeMessage(blogRelay.title, -dateDiff)
             : getDuringMessage(blogRelay.title, dateDiff, schedules)
-    const res = postMessage(traQ, messageHead + noticeMessage, false)
-    Logger.log(res.getResponseCode())
+    // const res = postMessage(traQ, messageHead + noticeMessage, false)
+    // Logger.log(res.getResponseCode())
     Logger.log(messageHead + noticeMessage)
     // const logMessage = extractScheduleStr(pageBody)
     const logMessage = schedulesToCalendar(blogRelay, schedules)
     const res2 = postMessage(traQ, logMessage, true)
     Logger.log(res2.getResponseCode())
-    // Logger.log(logMessage)
+    Logger.log(logMessage)
 }
 
 function getCrowiPageBody({ host, pagePath, token }: CrowiInfo): string {
@@ -204,7 +204,12 @@ function schedulesToCalendar(blogRelayInfo: BlogRelayInfo, schedules: Schedule[]
     }
     const calendarBody = weeks
         .map((week) =>
-            week.map((day) => day.map((schedule) => scheduleToStringInCalendar(schedule)).join(" ")).join(" | "),
+            week
+                .map((day) => {
+                    const cell = day.map((schedule) => scheduleToStringInCalendar(schedule)).join(" ")
+                    return cell.length === 0 ? ":null:" : cell
+                })
+                .join(" | "),
         )
         .join("\n")
     return `\
