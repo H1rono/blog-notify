@@ -107,8 +107,9 @@ function main(): void {
             : getDuringMessage(blogRelay.title, dateDiff, schedules)
     const res = postMessage(traQ, messageHead + noticeMessage, false)
     Logger.log(res.getResponseCode())
-    // Logger.log(messageHead + noticeMessage)
-    const logMessage = extractScheduleStr(pageBody)
+    Logger.log(messageHead + noticeMessage)
+    // const logMessage = extractScheduleStr(pageBody)
+    const logMessage = schedulesToCalendar(blogRelay, schedules)
     const res2 = postMessage(traQ, logMessage, true)
     Logger.log(res2.getResponseCode())
     // Logger.log(logMessage)
@@ -170,6 +171,46 @@ function schedulesToTable(schedules: Schedule[]): string {
 | 日付 | 日目 | 担当者 | タイトル(内容) |
 | :-: | :-: | :-: | :-- |
 ${schedules.map(scheduleToString).join("\n")}`
+}
+
+function actualDateOfSchedule({ startDate }: BlogRelayInfo, schedule: Schedule): Date {
+    // UNIXタイムスタンプ
+    const startDateMs = new Date(startDate).getTime()
+    // 経過日数のms
+    const diffMs = (schedule.day - 1) * 24 * 60 * 60 * 1000
+    const date = new Date(startDateMs + diffMs)
+    return date
+}
+
+function scheduleToStringInCalendar(schedule: Schedule): string {
+    return schedule.writer
+}
+
+function schedulesToCalendar(blogRelayInfo: BlogRelayInfo, schedules: Schedule[]): string {
+    const weeks: Schedule[][][] = []
+    let i = 0
+    const scheduleLength = schedules.length
+    while (i < scheduleLength) {
+        const week: Schedule[][] = []
+        for (let weekDay = 0; weekDay < 7; weekDay++) {
+            const day: Schedule[] = []
+            while (i < scheduleLength && actualDateOfSchedule(blogRelayInfo, schedules[i]).getDay() === weekDay) {
+                day.push(schedules[i])
+                i++
+            }
+            week.push(day)
+        }
+        weeks.push(week)
+    }
+    const calendarBody = weeks
+        .map((week) =>
+            week.map((day) => day.map((schedule) => scheduleToStringInCalendar(schedule)).join(" ")).join(" | "),
+        )
+        .join("\n")
+    return `\
+:day0_sunday: | :day1_monday: | :day2_tuesday: | :day3_wednesday: | :day4_thursday: | :day5_friday: | :day6_saturday:
+--- | --- | --- | --- | --- | --- | ---
+${calendarBody}`
 }
 
 function extractScheduleStr(pageBody: string): string {
