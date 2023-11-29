@@ -188,7 +188,7 @@ function actualDateOfSchedule({ startDate }: BlogRelayInfo, schedule: Schedule):
 }
 
 function scheduleToStringInCalendar(schedule: Schedule): string {
-    return `${schedule.writer} ${schedule.summary}`
+    return schedule.writer
 }
 
 function schedulesToCalendar(blogRelayInfo: BlogRelayInfo, schedules: Schedule[]): string {
@@ -218,8 +218,8 @@ function schedulesToCalendar(blogRelayInfo: BlogRelayInfo, schedules: Schedule[]
                     const date = dayInfo[0]
                     const day = dayInfo[1]
                     const dateStr = `${date.getMonth() + 1}/${date.getDate()}`
-                    const dayStr = day.map((schedule) => scheduleToStringInCalendar(schedule)).join("<br/>")
-                    return `**${dateStr}**<br/>${dayStr}`
+                    const dayStr = day.map((schedule) => scheduleToStringInCalendar(schedule)).join(" ")
+                    return `**${dateStr}**${dayStr}`
                 })
                 .join(" | "),
         )
