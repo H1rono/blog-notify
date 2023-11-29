@@ -105,8 +105,8 @@ function main(): void {
         dateDiff < 0
             ? getBeforeMessage(blogRelay.title, -dateDiff)
             : getDuringMessage(blogRelay.title, dateDiff, schedules)
-    // const res = postMessage(traQ, messageHead + noticeMessage, false)
-    // Logger.log(res.getResponseCode())
+    const res = postMessage(traQ, messageHead + noticeMessage, false)
+    Logger.log(res.getResponseCode())
     Logger.log(messageHead + noticeMessage)
     // const logMessage = extractScheduleStr(pageBody)
     const logMessage = schedulesToCalendar(blogRelay, schedules)
@@ -173,41 +173,53 @@ function schedulesToTable(schedules: Schedule[]): string {
 ${schedules.map(scheduleToString).join("\n")}`
 }
 
+function dateOffset(date: Date, offset: number): Date {
+    const dateMs = date.getTime()
+    const offsetMs = offset * 24 * 60 * 60 * 1000
+    return new Date(dateMs + offsetMs)
+}
+
 function actualDateOfSchedule({ startDate }: BlogRelayInfo, schedule: Schedule): Date {
     // UNIXタイムスタンプ
-    const startDateMs = new Date(startDate).getTime()
+    const startDateParsed = new Date(startDate)
     // 経過日数のms
-    const diffMs = (schedule.day - 1) * 24 * 60 * 60 * 1000
-    const date = new Date(startDateMs + diffMs)
-    return date
+    const offset = schedule.day - 1
+    return dateOffset(startDateParsed, offset)
 }
 
 function scheduleToStringInCalendar(schedule: Schedule): string {
-    return schedule.writer
+    return `${schedule.writer} ${schedule.summary}`
 }
 
 function schedulesToCalendar(blogRelayInfo: BlogRelayInfo, schedules: Schedule[]): string {
-    const weeks: Schedule[][][] = []
+    const weeks: Array<Array<[Date, Schedule[]]>> = []
     let i = 0
     const scheduleLength = schedules.length
+    const startDate = new Date(blogRelayInfo.startDate)
+    const calendarStartDate = dateOffset(startDate, -startDate.getDay())
     while (i < scheduleLength) {
-        const week: Schedule[][] = []
+        const week: Array<[Date, Schedule[]]> = []
+        const weekStartDate = dateOffset(calendarStartDate, weeks.length * 7)
         for (let weekDay = 0; weekDay < 7; weekDay++) {
             const day: Schedule[] = []
+            const date = dateOffset(weekStartDate, weekDay)
             while (i < scheduleLength && actualDateOfSchedule(blogRelayInfo, schedules[i]).getDay() === weekDay) {
                 day.push(schedules[i])
                 i++
             }
-            week.push(day)
+            week.push([date, day])
         }
         weeks.push(week)
     }
     const calendarBody = weeks
         .map((week) =>
             week
-                .map((day) => {
-                    const cell = day.map((schedule) => scheduleToStringInCalendar(schedule)).join(" ")
-                    return cell.length === 0 ? ":null:" : cell
+                .map((dayInfo) => {
+                    const date = dayInfo[0]
+                    const day = dayInfo[1]
+                    const dateStr = `${date.getMonth() + 1}/${date.getDate()}`
+                    const dayStr = day.map((schedule) => scheduleToStringInCalendar(schedule)).join("<br/>")
+                    return `**${dateStr}**<br/>${dayStr}`
                 })
                 .join(" | "),
         )
