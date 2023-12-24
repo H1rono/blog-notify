@@ -16,11 +16,13 @@ crowi → traQ Webhook with GAS
 [npm](https://www.npmjs.com/)と[clasp](https://github.com/google/clasp)に依存
 
 ```bash
+$ export YOUR_GAS_SCRIPT_ID= # GASプロジェクトのID
 $ git clone https://github.com/H1rono/blog-notify.git
 $ cd blog-notify
 $ npm i
-$ clasp clone --rootDir "$(pwd)" "${YOUR_GAS_SCRIPT_ID}"
-$ rm main.js    # ローカルではTypeScriptを使用するため削除
+$ npm run login  # 最初の一度のみ
+$ npm run clone -- "${YOUR_GAS_SCRIPT_ID}"
+$ rm main.js     # ローカルではTypeScriptを使用するため削除
 ```
 
 ## GASのプロパティ設定
