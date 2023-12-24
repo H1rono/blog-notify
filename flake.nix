@@ -15,8 +15,8 @@
         formatter = pkgs.nixpkgs-fmt;
 
         devShells.default = pkgs.stdenv.mkDerivation {
-          name = "node-and-clasp";
-          nativeBuildInputs = with pkgs; [ nodejs_20 google-clasp ];
+          name = "node";
+          nativeBuildInputs = with pkgs; [ nodejs_20 ];
         };
       }
     );
