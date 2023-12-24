@@ -10,7 +10,10 @@
     "fmt:check": "prettier --check .",
     "lint": "eslint ./main.ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "lint:warn": "eslint . --ext .ts --max-warnings 0"
+    "lint:warn": "eslint . --ext .ts --max-warnings 0",
+    "push": "clasp push",
+    "clone": "clasp clone",
+    "login": "clasp login"
   },
   "keywords": [],
   "author": "H1rono <hronok66@gmail.com>",
@@ -27,6 +30,7 @@
     "eslint-plugin-n": "^16.3.1",
     "eslint-plugin-promise": "^6.1.1",
     "prettier": "^3.1.0",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.2",
+    "@google/clasp": "^2.4.2"
   }
 }
