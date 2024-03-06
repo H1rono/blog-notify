@@ -36,6 +36,7 @@ key | value
 `TRAQ_CHANNEL_ID` | 通知を投稿するチャンネルのID
 `TRAQ_LOG_CHANNEL_ID` | 実行ログを流すチャンネルのID
 `TRAQ_BURI_CHANNEL_PATH` | ブログリレー運営チャンネルのパス(`#`始まり)
+`TRAQ_REVIEW_CHANNEL_PATH` | ブログの添削・相談用チャンネルのパス(`#`始まり)
 `WEBHOOK_SECRET` | Webhookシークレット
 `WEBHOOK_ID` | Webhook ID
 `TAG` | ブログリレーで使用するタグ
