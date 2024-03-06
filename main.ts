@@ -66,6 +66,7 @@ function init(): InitResult | null {
 - 記事の最後に次の日の担当者を紹介してください
 - **post imageを設定して**ください
 - わからないことがあれば気軽に ${traQBuriChannelPath} まで
+- 記事内容の添削や相談は、気軽に #random/review へ
 - 詳細は ${url}`
     return {
         crowi: {
