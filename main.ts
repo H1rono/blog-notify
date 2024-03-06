@@ -11,6 +11,7 @@ type traQInfo = {
     channelId: string
     logChannelId: string
     buriChannelPath: string
+    reviewChannelPath: string
     webhookId: string
     webhookSecret: string
 }
@@ -40,6 +41,7 @@ function init(): InitResult | null {
     const traQChannelId = props.getProperty("TRAQ_CHANNEL_ID")
     const traQLogChannelId = props.getProperty("TRAQ_LOG_CHANNEL_ID")
     const traQBuriChannelPath = props.getProperty("TRAQ_BURI_CHANNEL_PATH")
+    const traQReviewChannelPath = props.getProperty("TRAQ_REVIEW_CHANNEL_PATH")
     const traQWebhookId = props.getProperty("WEBHOOK_ID")
     const traQWebhookSecret = props.getProperty("WEBHOOK_SECRET")
     if (
@@ -47,6 +49,7 @@ function init(): InitResult | null {
         traQChannelId === null ||
         traQLogChannelId === null ||
         traQBuriChannelPath === null ||
+        traQReviewChannelPath === null ||
         traQWebhookId === null ||
         traQWebhookSecret === null
     ) {
@@ -66,7 +69,7 @@ function init(): InitResult | null {
 - 記事の最後に次の日の担当者を紹介してください
 - **post imageを設定して**ください
 - わからないことがあれば気軽に ${traQBuriChannelPath} まで
-- 記事内容の添削や相談は、気軽に #random/review へ
+- 記事内容の添削や相談は、気軽に ${traQReviewChannelPath} へ
 - 詳細は ${url}`
     return {
         crowi: {
@@ -79,6 +82,7 @@ function init(): InitResult | null {
             channelId: traQChannelId,
             logChannelId: traQLogChannelId,
             buriChannelPath: traQBuriChannelPath,
+            reviewChannelPath: traQReviewChannelPath,
             webhookId: traQWebhookId,
             webhookSecret: traQWebhookSecret,
         },
