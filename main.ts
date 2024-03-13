@@ -118,6 +118,7 @@ function main(): void {
     const res2 = postMessage(traQ, logMessage, true)
     Logger.log(res2.getResponseCode())
     Logger.log(logMessage)
+    deleteAllTrigger();
 }
 
 function getCrowiPageBody({ host, pagePath, token }: CrowiInfo): string {
@@ -319,6 +320,21 @@ function setTrigger(): void{
 
     // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
     ScriptApp.newTrigger(functionName).timeBased().at(setTime).create()
-    console.log('made trigger')
-    console.log(setTime)
-  }
+    Logger.log('made trigger')
+    Logger.log(setTime)
+}
+
+// 実行し終わったmainのトリガーを削除する関数
+function deleteAllTrigger(): void{
+    const functionName = 'main'
+    // GASプロジェクトに設定したトリガーをすべて取得
+    const triggers = ScriptApp.getProjectTriggers()
+    // トリガー登録のforループを実行
+    for(let i=0;i<triggers.length;i++){
+        // 取得したトリガーの関数がtriggerTestの場合、deleteTriggerで削除
+        if(triggers[i].getHandlerFunction()===functionName){
+            ScriptApp.deleteTrigger(triggers[i])
+            Logger.log('deleted main trigger')
+        }
+    }
+}
