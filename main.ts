@@ -304,3 +304,21 @@ function getDuringMessage(title: string, diff: number, schedules: Schedule[]): s
     }
     return `# ${title} ${d}日目\n担当者はいません`
 }
+
+// main関数を特定の時間に実行する関数
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function setTrigger(): void{
+    const props = PropertiesService.getScriptProperties()
+    const setHours = props.getProperty("SET_HOURS")
+    const setMinutes = props.getProperty("SET_MINUTES")
+    const now = new Date()
+
+    // トリガー登録したい時間、関数名を設定
+    const setTime = new Date(`${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${setHours}-${setMinutes}-00`)
+    const functionName = 'main'
+
+    // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
+    ScriptApp.newTrigger(functionName).timeBased().at(setTime).create()
+    console.log('made trigger')
+    console.log(setTime)
+  }
