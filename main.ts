@@ -118,7 +118,7 @@ function main(): void {
     const res2 = postMessage(traQ, logMessage, true)
     Logger.log(res2.getResponseCode())
     Logger.log(logMessage)
-    deleteAllTrigger();
+    deleteAllTrigger()
 }
 
 function getCrowiPageBody({ host, pagePath, token }: CrowiInfo): string {
@@ -308,33 +308,33 @@ function getDuringMessage(title: string, diff: number, schedules: Schedule[]): s
 
 // main関数を特定の時間に実行する関数
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function setTrigger(): void{
+function setTrigger(): void {
     const props = PropertiesService.getScriptProperties()
     const setHours = props.getProperty("SET_HOURS")
     const setMinutes = props.getProperty("SET_MINUTES")
     const now = new Date()
 
     // トリガー登録したい時間、関数名を設定
-    const setTime = new Date(`${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${setHours}-${setMinutes}-00`)
-    const functionName = 'main'
+    const setTime = new Date(`${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${setHours}-${setMinutes}-00`)
+    const functionName = "main"
 
     // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
     ScriptApp.newTrigger(functionName).timeBased().at(setTime).create()
-    Logger.log('made trigger')
+    Logger.log("made trigger")
     Logger.log(setTime)
 }
 
 // 実行し終わったmainのトリガーを削除する関数
-function deleteAllTrigger(): void{
-    const functionName = 'main'
+function deleteAllTrigger(): void {
+    const functionName = "main"
     // GASプロジェクトに設定したトリガーをすべて取得
     const triggers = ScriptApp.getProjectTriggers()
     // トリガー登録のforループを実行
-    for(let i=0;i<triggers.length;i++){
+    for (let i = 0; i < triggers.length; i++) {
         // 取得したトリガーの関数がtriggerTestの場合、deleteTriggerで削除
-        if(triggers[i].getHandlerFunction()===functionName){
+        if (triggers[i].getHandlerFunction() === functionName) {
             ScriptApp.deleteTrigger(triggers[i])
-            Logger.log('deleted main trigger')
+            Logger.log("deleted main trigger")
         }
     }
 }
