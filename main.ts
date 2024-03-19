@@ -309,13 +309,16 @@ function getDuringMessage(title: string, diff: number, schedules: Schedule[]): s
 // main関数を特定の時間に実行する関数
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setTrigger(): void {
-    const props = PropertiesService.getScriptProperties()
-    const setHours = props.getProperty("SET_HOURS")
-    const setMinutes = props.getProperty("SET_MINUTES")
     const now = new Date()
+    const props = PropertiesService.getScriptProperties()
+    const setYear = now.getFullYear()
+    const setMonth = ("00" + (now.getMonth() + 1)).slice(-2)
+    const setDate = ("00" + now.getDate()).slice(-2)
+    const setHours = ("00" + props.getProperty("SET_HOURS")).slice(-2)
+    const setMinutes = ("00" + props.getProperty("SET_MINUTES")).slice(-2)
 
     // トリガー登録したい時間、関数名を設定
-    const setTime = new Date(`${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${setHours}-${setMinutes}-00`)
+    const setTime = new Date(`${setYear}-${setMonth}-${setDate}T${setHours}:${setMinutes}:00+09:00`)
     const functionName = "main"
 
     // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
@@ -330,11 +333,12 @@ function deleteAllTrigger(): void {
     // GASプロジェクトに設定したトリガーをすべて取得
     const triggers = ScriptApp.getProjectTriggers()
     // トリガー登録のforループを実行
-    for (let i = 0; i < triggers.length; i++) {
-        // 取得したトリガーの関数がtriggerTestの場合、deleteTriggerで削除
-        if (triggers[i].getHandlerFunction() === functionName) {
-            ScriptApp.deleteTrigger(triggers[i])
-            Logger.log("deleted main trigger")
+    for (const trigger of triggers) {
+        // 取得したトリガーの関数が mainの場合、deleteTriggerで削除
+        if (trigger.getHandlerFunction() !== functionName) {
+            continue
         }
+        ScriptApp.deleteTrigger(trigger)
+        Logger.log("deleted main trigger")
     }
 }
