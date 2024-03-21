@@ -311,11 +311,11 @@ function getDuringMessage(title: string, diff: number, schedules: Schedule[]): s
 function setTrigger(): void {
     const now = new Date()
     const props = PropertiesService.getScriptProperties()
-    const setYear = now.getFullYear()
-    const setMonth = ("00" + (now.getMonth() + 1)).slice(-2)
-    const setDate = ("00" + now.getDate()).slice(-2)
-    const setHours = ("00" + props.getProperty("SET_HOURS")).slice(-2)
-    const setMinutes = ("00" + props.getProperty("SET_MINUTES")).slice(-2)
+    const setYear = now.getFullYear().toString()
+    const setMonth = (now.getMonth() + 1).toString().padStart(2,"0")
+    const setDate = now.getDate().toString().padStart(2,"0")
+    const setHours = props.getProperty("SET_HOURS")?.padStart(2,"0")
+    const setMinutes = props.getProperty("SET_MINUTES")?.padStart(2,"0")
 
     // トリガー登録したい時間、関数名を設定
     const setTime = new Date(`${setYear}-${setMonth}-${setDate}T${setHours}:${setMinutes}:00+09:00`)
