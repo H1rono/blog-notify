@@ -1,4 +1,5 @@
 const WRITER_REGEXP = /@[a-zA-Z0-9_-]+/g
+const FUNCTION_NAME = "main"
 
 type CrowiInfo = {
     host: string
@@ -316,26 +317,22 @@ function setTrigger(): void {
     const setDate = now.getDate().toString().padStart(2,"0")
     const setHours = props.getProperty("SET_HOURS")?.padStart(2,"0")
     const setMinutes = props.getProperty("SET_MINUTES")?.padStart(2,"0")
-
     // トリガー登録したい時間、関数名を設定
     const setTime = new Date(`${setYear}-${setMonth}-${setDate}T${setHours}:${setMinutes}:00+09:00`)
-    const functionName = "main"
-
     // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
-    ScriptApp.newTrigger(functionName).timeBased().at(setTime).create()
+    ScriptApp.newTrigger(FUNCTION_NAME).timeBased().at(setTime).create()
     Logger.log("made trigger")
     Logger.log(setTime)
 }
 
 // 実行し終わったmainのトリガーを削除する関数
 function deleteAllTrigger(): void {
-    const functionName = "main"
     // GASプロジェクトに設定したトリガーをすべて取得
     const triggers = ScriptApp.getProjectTriggers()
     // トリガー登録のforループを実行
     for (const trigger of triggers) {
         // 取得したトリガーの関数が mainの場合、deleteTriggerで削除
-        if (trigger.getHandlerFunction() !== functionName) {
+        if (trigger.getHandlerFunction() !== FUNCTION_NAME) {
             continue
         }
         ScriptApp.deleteTrigger(trigger)
