@@ -1,5 +1,5 @@
 const WRITER_REGEXP = /@[a-zA-Z0-9_-]+/g
-const FUNCTION_NAME = "main"
+const TRIGGER_FUNC_NAME = "main"
 
 type CrowiInfo = {
     host: string
@@ -307,7 +307,7 @@ function getDuringMessage(title: string, diff: number, schedules: Schedule[]): s
     return `# ${title} ${d}日目\n担当者はいません`
 }
 
-// main関数を特定の時間に実行する関数
+// TRIGGER_FUNC_NAMEで指定した関数を特定の時間に実行する関数
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setTrigger(): void {
     const now = new Date()
@@ -317,25 +317,28 @@ function setTrigger(): void {
     const setDate = now.getDate().toString().padStart(2, "0")
     const setHours = props.getProperty("SET_HOURS")?.padStart(2, "0")
     const setMinutes = props.getProperty("SET_MINUTES")?.padStart(2, "0")
+    if (setMinutes === undefined || setHours === undefined) {
+        Logger.log("set time undefined")
+        return
+    }
     // トリガー登録したい時間、関数名を設定
     const setTime = new Date(`${setYear}-${setMonth}-${setDate}T${setHours}:${setMinutes}:00+09:00`)
     // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
-    ScriptApp.newTrigger(FUNCTION_NAME).timeBased().at(setTime).create()
-    Logger.log("made trigger")
-    Logger.log(setTime)
+    ScriptApp.newTrigger(TRIGGER_FUNC_NAME).timeBased().at(setTime).create()
+    Logger.log(`made ${TRIGGER_FUNC_NAME} trigger at ${setTime.toISOString()}`)
 }
 
-// 実行し終わったmainのトリガーを削除する関数
+// 実行し終わったTRIGGER_FUNC_NAMEのトリガーを削除する関数
 function deleteAllTrigger(): void {
     // GASプロジェクトに設定したトリガーをすべて取得
     const triggers = ScriptApp.getProjectTriggers()
     // トリガー登録のforループを実行
     for (const trigger of triggers) {
-        // 取得したトリガーの関数が mainの場合、deleteTriggerで削除
-        if (trigger.getHandlerFunction() !== FUNCTION_NAME) {
+        // 取得したトリガーの関数が TRIGGER_FUNC_NAMEと一致したとき、deleteTriggerで削除
+        if (trigger.getHandlerFunction() !== TRIGGER_FUNC_NAME) {
             continue
         }
         ScriptApp.deleteTrigger(trigger)
-        Logger.log("deleted main trigger")
+        Logger.log(`deleted ${TRIGGER_FUNC_NAME} trigger`)
     }
 }
