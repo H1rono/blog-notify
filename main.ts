@@ -324,8 +324,8 @@ function InitSetTrigger(): InitSetTriggerResult | null {
     if (setYear === null || setMonth === null || setDate === null) {
         return null
     }
-    const setHours = props.getProperty("SET_HOURS")?.padStart(2, "0")
-    const setMinutes = props.getProperty("SET_MINUTES")?.padStart(2, "0")
+    const setHours = props.getProperty("TRIGGER_SET_HOURS")?.padStart(2, "0")
+    const setMinutes = props.getProperty("TRIGGER_SET_MINUTES")?.padStart(2, "0")
     if (setMinutes === undefined || setHours === undefined) {
         return null
     }
@@ -346,7 +346,7 @@ function setTrigger(): void {
         Logger.log("InitSetTrigger faled")
         return
     }
-    // トリガー登録したい時間、関数名を設定
+    // トリガー登録したい時間を設定
     const setTime = new Date(`${v.year}-${v.month}-${v.date}T${v.hours}:${v.minutes}:00+09:00`)
     // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
     ScriptApp.newTrigger(TRIGGER_FUNC_NAME).timeBased().at(setTime).create()
