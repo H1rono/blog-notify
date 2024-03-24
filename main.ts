@@ -30,6 +30,14 @@ type InitResult = {
     noticeMessage: string
 }
 
+type InitSetTriggerResult = {
+    year: string
+    month: string
+    date: string
+    hours: string
+    minutes: string
+}
+
 function init(): InitResult | null {
     const props = PropertiesService.getScriptProperties()
     const crowiHost = props.getProperty("CROWI_HOST")
@@ -307,22 +315,39 @@ function getDuringMessage(title: string, diff: number, schedules: Schedule[]): s
     return `# ${title} ${d}日目\n担当者はいません`
 }
 
-// TRIGGER_FUNC_NAMEで指定した関数を特定の時間に実行する関数
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function setTrigger(): void {
+function InitSetTrigger(): InitSetTriggerResult | null {
     const now = new Date()
     const props = PropertiesService.getScriptProperties()
     const setYear = now.getFullYear().toString()
     const setMonth = (now.getMonth() + 1).toString().padStart(2, "0")
     const setDate = now.getDate().toString().padStart(2, "0")
+    if (setYear === null || setMonth === null || setDate === null) {
+        return null
+    }
     const setHours = props.getProperty("SET_HOURS")?.padStart(2, "0")
     const setMinutes = props.getProperty("SET_MINUTES")?.padStart(2, "0")
     if (setMinutes === undefined || setHours === undefined) {
-        Logger.log("set time undefined")
+        return null
+    }
+    return {
+        year: setYear,
+        month: setMonth,
+        date: setDate,
+        hours: setHours,
+        minutes: setMinutes,
+    }
+}
+
+// TRIGGER_FUNC_NAMEで指定した関数を特定の時間に実行する関数
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function setTrigger(): void {
+    const v = InitSetTrigger()
+    if (v === null) {
+        Logger.log("InitSetTrigger faled")
         return
     }
     // トリガー登録したい時間、関数名を設定
-    const setTime = new Date(`${setYear}-${setMonth}-${setDate}T${setHours}:${setMinutes}:00+09:00`)
+    const setTime = new Date(`${v.year}-${v.month}-${v.date}T${v.hours}:${v.minutes}:00+09:00`)
     // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
     ScriptApp.newTrigger(TRIGGER_FUNC_NAME).timeBased().at(setTime).create()
     Logger.log(`made ${TRIGGER_FUNC_NAME} trigger at ${setTime.toISOString()}`)
