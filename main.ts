@@ -321,9 +321,6 @@ function InitSetTrigger(): InitSetTriggerResult | null {
     const setYear = now.getFullYear().toString()
     const setMonth = (now.getMonth() + 1).toString().padStart(2, "0")
     const setDate = now.getDate().toString().padStart(2, "0")
-    if (setYear === null || setMonth === null || setDate === null) {
-        return null
-    }
     const setHours = props.getProperty("TRIGGER_SET_HOURS")?.padStart(2, "0")
     const setMinutes = props.getProperty("TRIGGER_SET_MINUTES")?.padStart(2, "0")
     if (setMinutes === undefined || setHours === undefined) {
