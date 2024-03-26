@@ -1,4 +1,5 @@
 const WRITER_REGEXP = /@[a-zA-Z0-9_-]+/g
+const TRIGGER_FUNC_NAME = "main"
 
 type CrowiInfo = {
     host: string
@@ -27,6 +28,14 @@ type InitResult = {
     traQ: traQInfo
     blogRelay: BlogRelayInfo
     noticeMessage: string
+}
+
+type InitSetTriggerResult = {
+    year: string
+    month: string
+    date: string
+    hours: string
+    minutes: string
 }
 
 function init(): InitResult | null {
@@ -118,6 +127,7 @@ function main(): void {
     const res2 = postMessage(traQ, logMessage, true)
     Logger.log(res2.getResponseCode())
     Logger.log(logMessage)
+    deleteAllTrigger()
 }
 
 function getCrowiPageBody({ host, pagePath, token }: CrowiInfo): string {
@@ -303,4 +313,54 @@ function getDuringMessage(title: string, diff: number, schedules: Schedule[]): s
         return `# ${title} ${d}日目\n${schedulesToTable(ss)}`
     }
     return `# ${title} ${d}日目\n担当者はいません`
+}
+
+function InitSetTrigger(): InitSetTriggerResult | null {
+    const now = new Date()
+    const props = PropertiesService.getScriptProperties()
+    const setYear = now.getFullYear().toString()
+    const setMonth = (now.getMonth() + 1).toString().padStart(2, "0")
+    const setDate = now.getDate().toString().padStart(2, "0")
+    const setHours = props.getProperty("TRIGGER_SET_HOURS")?.padStart(2, "0")
+    const setMinutes = props.getProperty("TRIGGER_SET_MINUTES")?.padStart(2, "0")
+    if (setMinutes === undefined || setHours === undefined) {
+        return null
+    }
+    return {
+        year: setYear,
+        month: setMonth,
+        date: setDate,
+        hours: setHours,
+        minutes: setMinutes,
+    }
+}
+
+// TRIGGER_FUNC_NAMEで指定した関数を特定の時間に実行する関数
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function setTrigger(): void {
+    const v = InitSetTrigger()
+    if (v === null) {
+        Logger.log("InitSetTrigger faled")
+        return
+    }
+    // トリガー登録したい時間を設定
+    const setTime = new Date(`${v.year}-${v.month}-${v.date}T${v.hours}:${v.minutes}:00+09:00`)
+    // newTriggerメソッドでtriggerTestを特定日時でトリガー登録
+    ScriptApp.newTrigger(TRIGGER_FUNC_NAME).timeBased().at(setTime).create()
+    Logger.log(`made ${TRIGGER_FUNC_NAME} trigger at ${setTime.toISOString()}`)
+}
+
+// 実行し終わったTRIGGER_FUNC_NAMEのトリガーを削除する関数
+function deleteAllTrigger(): void {
+    // GASプロジェクトに設定したトリガーをすべて取得
+    const triggers = ScriptApp.getProjectTriggers()
+    // トリガー登録のforループを実行
+    for (const trigger of triggers) {
+        // 取得したトリガーの関数が TRIGGER_FUNC_NAMEと一致したとき、deleteTriggerで削除
+        if (trigger.getHandlerFunction() !== TRIGGER_FUNC_NAME) {
+            continue
+        }
+        ScriptApp.deleteTrigger(trigger)
+        Logger.log(`deleted ${TRIGGER_FUNC_NAME} trigger`)
+    }
 }

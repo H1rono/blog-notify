@@ -42,6 +42,8 @@ key | value
 `TAG` | ブログリレーで使用するタグ
 `TITLE` | ブログリレーのタイトル
 `START_DATE` | ブログリレー開始日
+`TRIGGER_SET_HOURS` | リマインドする時間(時)
+`TRIGGER_SET_MINUTES` | リマインドする時間(分)
 
 ## このリポジトリに関するブログ記事
 
