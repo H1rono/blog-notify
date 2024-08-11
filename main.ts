@@ -203,7 +203,7 @@ function actualDateOfSchedule({ startDate }: BlogRelayInfo, schedule: Schedule):
 }
 
 function scheduleToStringInCalendar(schedule: Schedule): string {
-    return schedule.writer
+    return schedule.writer.replace(/;/g, ":")
 }
 
 function schedulesToCalendar(blogRelayInfo: BlogRelayInfo, schedules: Schedule[]): string {
