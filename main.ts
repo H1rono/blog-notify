@@ -204,9 +204,9 @@ function actualDateOfSchedule({ startDate }: BlogRelayInfo, schedule: Schedule):
 
 function scheduleToStringInCalendar(schedule: Schedule): string {
     const writerIcons = Array.from(schedule.writer.matchAll(WRITER_REGEXP))
-        .map((match) => match[0])
-        .join("::")
-    return ":" + writerIcons + ":"
+        .map((match) => ":" + match[0] + ":")
+        .join("")
+    return writerIcons
 }
 
 function schedulesToCalendar(blogRelayInfo: BlogRelayInfo, schedules: Schedule[]): string {
