@@ -1,13 +1,9 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-        "config:recommended"
-    ],
+    "extends": ["config:recommended"],
     "dependencyDashboard": true,
     "timezone": "Asia/Tokyo",
-    "schedule": [
-        "* 0 * * 1"
-    ],
+    "schedule": ["* 0 * * 1"],
     "prHourlyLimit": 10,
     "lockFileMaintenance": {
         "enabled": true,
@@ -15,9 +11,7 @@
     },
     "packageRules": [
         {
-            "matchDepTypes": [
-                "action"
-            ],
+            "matchDepTypes": ["action"],
             "groupName": "github-actions",
             "automerge": true
         }
