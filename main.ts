@@ -136,7 +136,7 @@ function getCrowiPageBody({ host, pagePath, token }: CrowiInfo): string {
     const res = UrlFetchApp.fetch(url);
     const payload = JSON.parse(res.getContentText());
     // eslint-disable-next-line @typescript-eslint/dot-notation
-    return payload["page"]["revision"]["body"] as string;
+    return payload.page.revision.body as string;
 }
 
 function hmacSha1(key: string, message: string): string {
@@ -263,7 +263,7 @@ function extractScheduleStr(pageBody: string): string {
     for (let i = startIndex; i < lines.length; ++i) {
         const l = lines[i];
         if (/^\s*\|.*/.test(l)) {
-            table += l + "\n";
+            table += `${l}\n`;
         } else {
             break;
         }
