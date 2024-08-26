@@ -6,9 +6,6 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "lint": "eslint ./main.ts",
-    "lint:fix": "eslint . --ext .ts --fix",
-    "lint:warn": "eslint . --ext .ts --max-warnings 0",
     "push": "clasp push",
     "clone": "clasp clone",
     "login": "clasp login"
@@ -20,12 +17,6 @@
     "@types/google-apps-script": "^1.0.78"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "eslint": "^8.54.0",
-    "eslint-config-standard-with-typescript": "^43.0.0",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-n": "^16.3.1",
-    "eslint-plugin-promise": "^6.1.1",
     "typescript": "^5.3.2",
     "@google/clasp": "^2.4.2"
   }
