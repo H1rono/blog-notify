@@ -1,7 +1,7 @@
 {
     "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
     "files": {
-        "ignore": [".clasp.json", "package-lock.json", "package.json"]
+        "ignore": [".clasp.json", "package-lock.json", "package.json", "dist/*"]
     },
     "formatter": {
         "enabled": true,
