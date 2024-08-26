@@ -6,6 +6,10 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "fmt": "biome format --write",
+    "fmt:check": "biome format",
+    "lint": "biome lint --write",
+    "lint:check": "biome lint",
     "push": "clasp push",
     "clone": "clasp clone",
     "login": "clasp login"
@@ -17,7 +21,8 @@
     "@types/google-apps-script": "^1.0.78"
   },
   "devDependencies": {
-    "typescript": "^5.3.2",
-    "@google/clasp": "^2.4.2"
+    "@biomejs/biome": "1.8.3",
+    "@google/clasp": "^2.4.2",
+    "typescript": "^5.3.2"
   }
 }
