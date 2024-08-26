@@ -104,7 +104,6 @@ function init(): InitResult | null {
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function main(): void {
     const v = init();
     if (v === null) {
@@ -135,7 +134,6 @@ function getCrowiPageBody({ host, pagePath, token }: CrowiInfo): string {
     const url = `https://${host}/_api/pages.get?access_token=${token}&path=${encodedPath}`;
     const res = UrlFetchApp.fetch(url);
     const payload = JSON.parse(res.getContentText());
-    // eslint-disable-next-line @typescript-eslint/dot-notation
     return payload.page.revision.body as string;
 }
 
@@ -347,7 +345,6 @@ function InitSetTrigger(): InitSetTriggerResult | null {
 }
 
 // TRIGGER_FUNC_NAMEで指定した関数を特定の時間に実行する関数
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setTrigger(): void {
     const v = InitSetTrigger();
     if (v === null) {
