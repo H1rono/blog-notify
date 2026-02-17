@@ -19,7 +19,7 @@
   "author": "H1rono <hronok66@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@types/google-apps-script": "^1.0.78"
+    "@types/google-apps-script": "^2.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
